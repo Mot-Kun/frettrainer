@@ -1,21 +1,14 @@
 import './App.css';
 import { useState } from "react";
+import { fretboard } from "./fretboard";
+import { checkNotes, getRandomNote } from "./noteUtils";
 
 function App() {
   // 1. Daten und TypeScript
- const [selectedNote, setSelectedNote] = useState("");
+  const [selectedNote, setSelectedNote] = useState("");
+  const [randomNote, setRandomNote] = useState(getRandomNote);
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
-  const fretboard: string[][] = [
-    ["E", "F", "F#", "G", "G#", "A"],
-    ["A", "A#", "B", "C", "C#", "D"],
-    ["D", "D#", "E", "F", "F#", "G"],
-    ["G", "G#", "A", "A#", "B", "C"],
-    ["B", "C", "C#", "D", "D#", "E"],
-    ["E", "F", "F#", "G", "G#", "A"]
-  ];
-
-
- 
   // 2. Oberfläche
   return (
     <main className="app">
@@ -26,7 +19,9 @@ function App() {
 
         <p>Learn the guitar fretboard.</p>
 
-        <h2>Welche Note ist gesucht?</h2>
+        <h2>Drücke Note {randomNote}</h2>
+
+
 
         <div className="fretboard">
           {fretboard.map((string, stringIndex) => {
@@ -35,7 +30,14 @@ function App() {
                 {string.map((note, fretIndex) => {
                   return (
                     <button key={fretIndex}
-                    onClick={() => setSelectedNote(note)}
+                      className={fretIndex === 0 ? "open-string" : ""}
+                      onClick={() => {
+                        setSelectedNote(note);
+                        setIsCorrect(checkNotes(note, randomNote));
+                        setRandomNote(getRandomNote());
+                        
+                      }}
+
                     >
                       {note}
                     </button>
@@ -44,7 +46,14 @@ function App() {
               </div>
             );
           })}
-        <p>Ausgewählte Note: {selectedNote}</p>
+          
+          {isCorrect !== null && (
+            <p>
+              {isCorrect ? "Richtig! 🎉" : "Leider falsch!"}
+            </p>
+          )}
+
+
         </div>
 
 
@@ -53,5 +62,6 @@ function App() {
     </main>
   );
 }
+
 
 export default App;
